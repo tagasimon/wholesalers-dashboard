@@ -2,21 +2,20 @@
 processed_df %>% View()
 processed_df %>% glimpse()
 
-plt1 <- processed_df %>% 
+processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
   filter(!is.na(identification)) %>%
   # filter(!is.na(Trained)) %>% 
   mutate(Trained = ifelse(is.na(Trained), "No", Trained)) %>% 
-  ggplot(aes(type_of_business, fill = Trained)) + 
-  geom_bar(position = "dodge") +
-  facet_grid(.~Trained) +
+  ggplot(aes(requests)) + 
+  geom_bar() +
+  facet_grid(.~gender) +
   geom_text(stat='count', aes(label=..count..), vjust=-1)
-  ggtitle("What Type of Business do Registered People Have?") +
+  # ggtitle("What Type of Business do Registered People Have?")
   # coord_polar()
   # theme(legend.position="none")
 
-plt1
 
 #  [1] "start"                                                
 #  [2] "end"                                                  
