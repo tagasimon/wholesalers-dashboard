@@ -1,116 +1,128 @@
 ---
-title: "NICE HOUSE OF PLASTICS"
+title: "NHOP"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
     vertical_layout: scroll
     theme: flatly
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(DT)
-library(tidyverse)
+library(dplyr)
+library(tidyr)
 library(readxl)
+library(forcats)
 library(DataExplorer)
 library(eeptools)
 library(patchwork)
 library(leaflet)
 library(tidytext)
+library(googlesheets4)
+gs4_deauth()
+theme_set(theme_light())
 #flatly
 #united
 ```
 
-```{r}
-df <- read_excel("sample-data/Database as at 12 Jan 2021.xlsx", na = c(NA, "", " "))
 
+```{r}
+# df <- read_excel("sample-data/Database as of 26.01.21.xlsx", sheet = 1)
+# df <- read_excel("sample-data/NEW/Data Nansana -Ganda(AutoRecovered).xlsx")
+df <- googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/1l8cQWfJAy1UdnLgOKHe7twpv6UrrIQHUkmIP2VY3_QU/edit?usp=sharing")
+
+# df <- readxl::read_excel("/home/nice-bsa/Downloads/NHOP_agents_database_shoreline.xlsx")
 processed_df <- df %>% 
-  select("_id",
-         "group_ev6dr15/rec_date", 
-         "group_ev6dr15/r_name",
-         "group_ev6dr15/surname",
-         "Trained",
-         "Signed contract",
-         "group_ev6dr15/Adress_details",
-         "group_ev6dr15/location_district",
-         "group_ev6dr15/location_subcounty",
-         "group_ev6dr15/location",
-         "group_ev6dr15/Village",
-         "group_ev6dr15/dob",
-         "group_ev6dr15/year",
-         "group_ev6dr15/assign_id",
-         "group_ev6dr15/id",
-         "group_ev6dr15/sex",
-         "group_ev6dr15/Marital_status",
-         "group_ev6dr15/tel",
-         "group_ev6dr15/kin",
-         "group_ev6dr15/kin_address",
-         "group_ev6dr15/kin_tel",
-         "group_ev6dr15/kin_id",
-         "group_sc15r33/business",
-         "group_sc15r33/type_business",
-         "group_sc15r33/where",
-         "group_sc15r33/premise",
-        "group_sc15r33/period_opn",
-        "group_sc15r33/num_staff",
-        "group_sc15r33/customers",
-        "group_sc15r33/freq_purchases",
-        "group_sc15r33/suppliers",
-        "group_sc15r33/exprn",
-        "group_sc15r33/If_yes_tick_appropriately",
-        "group_sc15r33/If_yes_tick_appropriately/1",
-        "group_sc15r33/If_yes_tick_appropriately/2",
-        "group_sc15r33/If_yes_tick_appropriately/3",
-        "group_sc15r33/saving",
-        "group_sc15r33/saving_scheme",
-        "group_sc15r33/saving_scheme/saving_group",             
-        "group_sc15r33/saving_scheme/micro_finance_institution",
-        "group_sc15r33/saving_scheme/sacco",                    
-        "group_sc15r33/saving_scheme/bank",                     
-        "group_sc15r33/loan",             
-        "group_sc15r33/loan_src",
-        "group_sc15r33/loan_src/saving_group",              
-        "group_sc15r33/loan_src/sacco",                     
-        "group_sc15r33/loan_src/microfinance_institution",  
-        "group_sc15r33/loan_src/bank",                      
-        "group_sc15r33/loan_src/friends_and_family",
-        "group_sc15r33/loan_amt",
-         "group_sc15r33/serv_loan",
-        "group_sc15r33/ern/gross_profit",
-        "group_sc15r33/ern/net_profit",
-        "group_sc15r33/need",
-        "group_sc15r33/training",
-        "group_sc15r33/products/nhop1",  # NHOP products you know
-        "group_sc15r33/products/nhop2",                         
-        "group_sc15r33/products/nhop3",                         
-        "group_sc15r33/goals/goal1",    # Goal                   
-        "group_sc15r33/goals/goal2",                            
-        "group_sc15r33/goals/goal3",                            
-        "group_sc15r33/motivation/mot1",  # Motivation           
-        "group_sc15r33/motivation/mot2",                        
-        "group_sc15r33/motivation/mot3",                        
-        "group_sc15r33/activation" , # activation                
-        "group_sc15r33/why/reason1",   # Why                     
-        "group_sc15r33/why/reason2",                            
-        "group_sc15r33/why/reason3",                            
-        "group_sc15r33/will_train",   # Are you willing to train 
-        # "GPS",           # GPS                     
-        "_GPS_latitude",        
-        "_GPS_longitude",      
-        # "_GPS_altitude",     
-        # "_GPS_precision",  
+  select( "_index",
+          "group_ev6dr15/rec_date",
+          "group_ev6dr15/r_name",
+          "group_ev6dr15/surname",
+          "Trained",
+          "signed contract",
+          "group_ev6dr15/Adress_details",
+          "group_ev6dr15/location_district",
+          "group_ev6dr15/location_subcounty",
+          "group_ev6dr15/location",
+          "group_ev6dr15/Village",
+          "group_ev6dr15/dob",
+          # "group_ev6dr15/year",
+          "group_ev6dr15/assign_id",
+          "group_ev6dr15/id",
+          "group_ev6dr15/sex",
+          "group_ev6dr15/Marital_status",
+          "group_ev6dr15/tel",
+          "group_ev6dr15/kin",
+          "group_ev6dr15/kin_address",
+          "group_ev6dr15/kin_tel",
+          "group_ev6dr15/kin_id",
+          "group_sc15r33/business",
+          "group_sc15r33/type_business",
+          "group_sc15r33/where",
+          "group_sc15r33/premise",
+          "group_sc15r33/period_opn",
+          "group_sc15r33/num_staff",
+          "group_sc15r33/customers",
+          "group_sc15r33/freq_purchases",
+          "group_sc15r33/suppliers",
+          "group_sc15r33/exprn",
+          "group_sc15r33/If_yes_tick_appropriately",
+          "group_sc15r33/If_yes_tick_appropriately/1",
+          "group_sc15r33/If_yes_tick_appropriately/2",
+          "group_sc15r33/If_yes_tick_appropriately/3",
+          "group_sc15r33/saving",
+          "group_sc15r33/saving_scheme",
+          "group_sc15r33/saving_scheme/saving_group",             
+          # "group_sc15r33/saving_scheme/micro_finance_institution",
+          "group_sc15r33/saving_scheme/sacco",                    
+          "group_sc15r33/saving_scheme/bank",                     
+          "group_sc15r33/loan",             
+          "group_sc15r33/loan_src",
+          "group_sc15r33/loan_src/saving_group",              
+          "group_sc15r33/loan_src/sacco",                     
+          # "group_sc15r33/loan_src/microfinance_institution ",  
+          "group_sc15r33/loan_src/bank",                      
+          "group_sc15r33/loan_src/friends_and_family",
+          "group_sc15r33/loan_amt",
+           "group_sc15r33/serv_loan",
+          "group_sc15r33/ern/gross_profit",
+          # "group_sc15r33/ern/net_profit",
+          "group_sc15r33/need",
+          "group_sc15r33/training",
+          "group_sc15r33/products/nhop1",  # NHOP products you know
+          "group_sc15r33/products/nhop2",                         
+          "group_sc15r33/products/nhop3",                         
+          "group_sc15r33/goals/goal1",    # Goal                   
+          "group_sc15r33/goals/goal2",                            
+          "group_sc15r33/goals/goal3",                            
+          "group_sc15r33/motivation/mot1",  # Motivation           
+          "group_sc15r33/motivation/mot2",                        
+          "group_sc15r33/motivation/mot3",                        
+          "group_sc15r33/activation" , # Activation                
+          "group_sc15r33/why/reason1",   # Why                     
+          "group_sc15r33/why/reason2",                            
+          "group_sc15r33/why/reason3",                            
+          "group_sc15r33/will_train",   # Are you willing to train 
+          # "GPS",           # GPS                     
+          "_GPS_latitude",        
+          "_GPS_longitude",      
+          # "_GPS_altitude",     
+          # "_GPS_precision",  
         )%>% 
-  rename("ID" = "_id",
-         "date" = "group_ev6dr15/rec_date", 
+  rename("ID" = "_index", ## --------
+         "date" = "group_ev6dr15/rec_date",
          "first_name" = "group_ev6dr15/r_name",
           "surname" = "group_ev6dr15/surname",
+          "signed_contract" = `signed contract`,
           "address_details" = "group_ev6dr15/Adress_details", 
           "district" = "group_ev6dr15/location_district",
           "sub_county" =  "group_ev6dr15/location_subcounty",
           "location" = "group_ev6dr15/location",              
           "village" = "group_ev6dr15/Village",              
           "date_of_birth" = "group_ev6dr15/dob",               
-          "year" = "group_ev6dr15/year",                       
+          # "year" = "group_ev6dr15/year",         ## --------              
           "assign_ID" = "group_ev6dr15/assign_id",
           "identification" = "group_ev6dr15/id",
           "gender" = "group_ev6dr15/sex",
@@ -130,7 +142,7 @@ processed_df <- df %>%
           "frequency_of_purchase" = "group_sc15r33/freq_purchases",   
           "suppliers" = "group_sc15r33/suppliers",        
           "do_you_have_biz_experience" = "group_sc15r33/exprn",  
-           "for_how_long" = "group_sc15r33/If_yes_tick_appropriately", 
+          "for_how_long" = "group_sc15r33/If_yes_tick_appropriately", 
           "are_you_in_a_savings_group" = "group_sc15r33/saving",
           "type_of_saving_scheme" =  "group_sc15r33/saving_scheme",
           "ever_taken_a_loan" = "group_sc15r33/loan",
@@ -138,7 +150,7 @@ processed_df <- df %>%
           "loan_amount" = "group_sc15r33/loan_amt",          
           "how_long" = "group_sc15r33/serv_loan",             
           "gross_profit" = "group_sc15r33/ern/gross_profit",  
-          "net_profit" = "group_sc15r33/ern/net_profit",
+          # "net_profit" = "group_sc15r33/ern/net_profit",
           "requests" = "group_sc15r33/need",
           "ever_gone_through_training" = "group_sc15r33/training",
           "activation" =  "group_sc15r33/activation",
@@ -146,33 +158,22 @@ processed_df <- df %>%
           "latitude" = "_GPS_latitude",   
           "longitude" = "_GPS_longitude"  
          ) %>% 
+  # REMVOE THESE COLUMNS
   select(-contains("saving_scheme")) %>% 
   select(-contains("loan_src")) %>% 
   select(-contains("if_yes_tick_appro")) %>%   
-   
-  # pivot_longer(cols = contains("goals"),
-  #              names_to = "goals_col",
-  #              values_to = "goals") %>%
-  # pivot_longer(cols = contains("motivation"),
-  #              names_to = "motivation_col",
-  #              values_to = "motivations") %>%
-  # pivot_longer(cols = contains("reason"),
-  #              names_to = "reasons_col",
-  #              values_to = "reason_for_participation") %>%
-  # select(-c("products_col","goals_col","motivation_col", "reasons_col")) %>%
-  rename("signed_contract"=`Signed contract`) %>% 
+
   # fix the 2 Yes in the dataset
   mutate(Trained = ifelse(Trained == "yes", "Yes", Trained)) %>% 
+  mutate(signed_contract = ifelse(signed_contract == "yes", "Yes", signed_contract)) %>%
   as_tibble()
 ```
 
-Row {data-height=100}
--------------------------------------
-<center><p class="h2">Summary Stats</p></center>
+## Row
+
+### Number of Females Registered
 
 ```{r}
-#### FEMALE
-
 registered_c_female <- processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
@@ -180,6 +181,12 @@ registered_c_female <- processed_df %>%
   filter(gender == 'female') %>% 
   pull(n)
 
+valueBox(registered_c_female, icon = "fa-female", color = "success")
+```
+
+### Number of Males Registered
+
+```{r}
 registered_c_male <- processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
@@ -187,6 +194,12 @@ registered_c_male <- processed_df %>%
   filter(gender == 'male') %>% 
   pull(n)
 
+valueBox(registered_c_male, icon = "fa-male", color = "info")
+```
+
+### Unknown Genders Registered
+
+```{r}
 registered_c_unknown <- processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
@@ -194,50 +207,27 @@ registered_c_unknown <- processed_df %>%
   filter(is.na(gender)) %>% 
   pull(n)
 
-registered_c_total <- processed_df %>% 
-  add_count(ID) %>% 
-  filter(!duplicated(ID)) %>% 
-  count(gender) %>% 
-  summarise(total = sum(n)) %>% 
-  pull(total)
-```
-
-Row
------------------------------------------------------------------------
-### Number of Females Registered
-
-```{r}
-valueBox(registered_c_female, icon = "fa-female", color = "success")
-```
-
-### Number of Males Registered
-
-```{r}
-valueBox(registered_c_male, icon = "fa-male", color = "info")
-```
-
-### Unknown Genders Registered
-```{r}
-valueBox(registered_c_unknown, icon = "fa-question", color = "primary")
+valueBox(0, icon = "fa-question", color = "primary")
 ```
 
 ### Total Number of Registered
 
 ```{r}
-valueBox(registered_c_total, icon = "fa-plus",color = "warning")
-```
-
-```{r}
-#### TRAINED VS UNTRAINED
-trained_c_male <- processed_df %>% 
+registered_c_total <- processed_df %>% 
   add_count(ID) %>% 
-  filter(!duplicated(ID)) %>% 
-  filter(gender == 'male') %>% 
-  count(Trained) %>% 
-  filter(!is.na(Trained)) %>% 
+  filter(!duplicated(ID)) %>%
+  count(gender) %>% 
   summarise(total = sum(n)) %>% 
   pull(total)
 
+valueBox(registered_c_total, icon = "fa-plus",color = "warning")
+```
+
+## Row
+
+### Number of Females Trained
+
+```{r}
 trained_c_female <- processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
@@ -247,6 +237,27 @@ trained_c_female <- processed_df %>%
   summarise(total = sum(n)) %>% 
   pull(total)
 
+valueBox(trained_c_female, icon = "fa-female", color = "success")
+```
+
+### Number of Males Trained
+
+```{r}
+trained_c_male <- processed_df %>% 
+  add_count(ID) %>% 
+  filter(!duplicated(ID)) %>% 
+  filter(gender == 'male') %>% 
+  count(Trained) %>% 
+  filter(!is.na(Trained)) %>% 
+  summarise(total = sum(n)) %>% 
+  pull(total)
+
+valueBox(trained_c_male, icon = "fa-male", color = "info")
+```
+
+### Unknown Gender Trained
+
+```{r}
 trained_c_unknown<- processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
@@ -256,7 +267,13 @@ trained_c_unknown<- processed_df %>%
   summarise(total = sum(n)) %>% 
   pull(total)
 
-trained_c_total <- processed_df %>% 
+valueBox(trained_c_unknown, icon = "fa-question", color = "primary")
+```
+
+### Total Number of People Trained
+
+```{r}
+trained_c_total <-processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
   count(Trained) %>% 
@@ -264,31 +281,12 @@ trained_c_total <- processed_df %>%
   summarise(total = sum(n)) %>% 
   pull(total)
 
-```
-Row
------------------------------------------------------------------------
-### Number of Females Trained
-
-```{r}
-valueBox(trained_c_female, icon = "fa-female", color = "success")
-```
-
-### Number of Males Trained
-
-```{r}
-valueBox(trained_c_male, icon = "fa-male", color = "info")
-```
-
-### Uknown Gender Trained
-```{r}
-valueBox(trained_c_unknown, icon = "fa-question", color = "primary")
-```
-
-### Total Number of People Trained
-
-```{r}
 valueBox(trained_c_total, icon = "fa-plus",color = "warning")
 ```
+
+## Row
+
+### Number of Females: Signed Contracts
 
 ```{r}
 signed_c_female <- processed_df %>% 
@@ -300,6 +298,12 @@ signed_c_female <- processed_df %>%
   summarise(total = sum(n)) %>% 
   pull(total)
 
+valueBox(signed_c_female, icon = "fa-female", color = "success")
+```
+
+### Number of Males: Signed Contracts
+
+```{r}
 signed_c_male <- processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
@@ -309,6 +313,12 @@ signed_c_male <- processed_df %>%
   summarise(total = sum(n)) %>% 
   pull(total)
 
+valueBox(signed_c_male, icon = "fa-male", color = "info")
+```
+
+### Unknown Gender: Signed Contracts
+
+```{r}
 signed_c_unknown <- processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
@@ -318,6 +328,12 @@ signed_c_unknown <- processed_df %>%
   summarise(total = sum(n)) %>% 
   pull(total)
 
+valueBox(signed_c_unknown, icon = "fa-question", color = "primary")
+```
+
+### Total Number of People: Signed Contracts
+
+```{r}
 total_signed_c <- processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
@@ -326,44 +342,22 @@ total_signed_c <- processed_df %>%
   filter(!is.na(signed_contract)) %>% 
   summarise(total = sum(n)) %>% 
   pull(total)
-```
 
-Row
------------------------------------------------------------------------
-### Number of Females: Signed Contracts
-
-```{r}
-valueBox(signed_c_female, icon = "fa-female", color = "success")
-```
-
-### Number of Males: Signed Contracts
-
-```{r}
-valueBox(signed_c_male, icon = "fa-male", color = "info")
-```
-
-### Uknown Gender: Signed Contracts
-```{r}
-valueBox(signed_c_unknown, icon = "fa-question", color = "primary")
-```
-
-### Total Number of People: Signed Contracts
-
-```{r}
 valueBox(total_signed_c, icon = "fa-plus",color = "warning")
 ```
 
-Row {data-height=100}
--------------------------------------
+## Row {data-height="100"}
+
 <center><p class="h2">Graphs & Plots</p></center>
 
-Row {.tabset .tabset-fade}
--------------------------------------
+## Row {.tabset .tabset-fade}
 
 ### Map
 
 ```{r}
-map_df <- processed_df %>% select(longitude, latitude)
+map_df <- processed_df %>% 
+  select(longitude, latitude)
+
 map_dff <- unique(map_df)
 leaflet(data = map_dff) %>% 
   addTiles() %>%  
@@ -374,9 +368,9 @@ leaflet(data = map_dff) %>%
           lat = 0.320382,
           zoom = 9)
 ```
-   
-### Age
-    
+
+### Age Distribution
+
 ```{r fig.width=10, fig.height=5}
 processed_df %>% 
   add_count(ID) %>% 
@@ -394,45 +388,72 @@ processed_df %>%
   facet_grid(~gender) +
   ggtitle("Age Distribution for all Registered", 
           subtitle = "0 & NA Ages Filtered Out, Vertical Lines Show the Age Range(0-35)") +
-  geom_text(stat='count', aes(label=..count..), vjust=-1)
+  geom_text(stat='count', aes(label=..count..), vjust=-1) +
+  ylim(0, 40) +
+  ylab("# of People")
 
 ```
 
-### identification
-    
+### Identification
+
 ```{r}
 processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
   filter(!is.na(identification)) %>%
   # filter(!is.na(Trained)) %>% 
-  mutate(Trained = ifelse(is.na(Trained), "No", Trained)) %>% 
+  mutate(Trained = ifelse(is.na(Trained), "Not Trained", Trained)) %>% 
+  mutate(Trained = ifelse(Trained == "Yes", "Trained", Trained)) %>% 
   ggplot(aes(identification, fill = gender)) + geom_bar(position = "dodge") +
   facet_grid(.~Trained) +
   geom_text(stat='count', aes(label=..count..), vjust=-1) +
-  ggtitle("What identification do Trained People have?")+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  ggtitle("What identification do Trained? UnTrained People have?")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  ylim(0, 250)+
+  ylab("# of People")
   # theme(legend.position="none")
 
 ```
 
-### Business Type
-    
+### Business : Trained / NotTrained
+
 ```{r}
 processed_df %>% 
   add_count(ID) %>% 
   filter(!duplicated(ID)) %>% 
   filter(!is.na(identification)) %>%
   # filter(!is.na(Trained)) %>% 
-  mutate(Trained = ifelse(is.na(Trained), "No", Trained)) %>% 
+  mutate(Trained = ifelse(is.na(Trained), "Not Trained", Trained)) %>% 
+  mutate(Trained = ifelse(Trained == "Yes", "Trained", Trained)) %>% 
   ggplot(aes(type_of_business, fill = Trained)) + 
   geom_bar(position = "dodge") +
   facet_grid(.~Trained) +
   geom_text(stat='count', aes(label=..count..), vjust=-1) +
   ggtitle("What Type of Business do Trained People Have?") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="none") +
+  ylim(0, 300) +
+  ylab("# of People")
 ```
+
+### Business : Trained & Signed
+```{r}
+processed_df %>% 
+  add_count(ID) %>% 
+  filter(!duplicated(ID)) %>% 
+  filter(!is.na(identification)) %>%
+  filter(!is.na(Trained)) %>% 
+  mutate(Trained = ifelse(is.na(Trained), "No", Trained)) %>% 
+  filter(signed_contract == "yes") %>% 
+  ggplot(aes(type_of_business, fill = Trained)) + 
+  geom_bar(position = "dodge") +
+  # facet_grid(.~Trained) +
+  geom_text(stat='count', aes(label=..count..), vjust=-1) +
+  ggtitle("Type of Business Owned by those Trained and Signed") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), legend.position="none") +
+  ylim(0, 50) +
+  ylab("# of People")
+```
+
 
 ### Frequency of purchase
 
@@ -446,10 +467,12 @@ processed_df %>%
   ggplot(aes(frequency_of_purchase)) + 
   geom_bar() +
   # facet_grid(.~gender) +
-  geom_text(stat='count', aes(label=..count..), vjust=-1)
-```  
+  ggtitle("Frequency of purchase") +
+  geom_text(stat='count', aes(label=..count..), vjust=-1) +
+  ylim(0, 250)
+```
 
-### Top 10 Most Popular Products 
+### Top 10 Most Popular Products
 
 ```{r}
 processed_df %>% 
@@ -482,8 +505,10 @@ processed_df %>%
   mutate(products = fct_reorder(products, n)) %>%
   ggplot(aes(products, n)) +
   geom_col() +
+  ggtitle("Top 10 Most Popular Products among all") +
   coord_flip() +
-  labs(x="", y="Count")
+  labs(x="", y="Count") +
+  ylim(0, 250)
 ```
 
 ### Common Words in Why/Reason
@@ -503,7 +528,9 @@ pivot_longer(cols = contains("reason"),
   ggplot(aes(word, n)) +
   geom_col() +
   coord_flip() +
-  labs(x="", y="Count")
+  ggtitle("Most Common Words in Why/Reason") +
+  labs(x="", y="Count") + 
+  ylim(0, 200)
 ```
 
 ```{r}
@@ -544,20 +571,19 @@ pivot_longer(cols = contains("reason"),
 #   labs(x="", y="Count")
 ```
 
-
-
 ### Missing Data
 
 ```{r fig.width=10, fig.height=10, fig.align='left'}
 DataExplorer::plot_missing(processed_df)
-```  
-
-Row 
--------------------------------------
-    
-### Dataset
-    
-```{r}
-DT::datatable(head(processed_df, 20))
 ```
+
+## Row
+
+### Dataset
+
+```{r}
+# DT::datatable(head(processed_df, 20))
+```
+
+
 

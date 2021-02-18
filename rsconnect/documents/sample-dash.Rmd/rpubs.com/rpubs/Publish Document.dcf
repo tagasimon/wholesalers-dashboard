@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/716977/5a64207ff433488fbb5f18be1e68bbda
+bundleId: https://api.rpubs.com/api/v1/document/716977/5a64207ff433488fbb5f18be1e68bbda
+url: http://rpubs.com/simonsayz/716977
+when: 1611812880.09816
